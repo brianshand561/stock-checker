@@ -33,7 +33,7 @@
 
     // Assuming you have an API Gateway or some backend endpoint to hit.
     // Your backend should then communicate with AlphaVantage to get the stock price.
-    const response = await fetch(`{{API_ENDPOINT}}?ticker=${tickerSymbol}`);
+    const response = await fetch(`https://${Token[TOKEN.670]}.execute-api.${Token[AWS.Region.11]}.${Token[AWS.URLSuffix.8]}/${Token[TOKEN.678]}/?ticker=${tickerSymbol}`);
     const data = await response.json();
 
     const rawPrice = parseFloat(data["Global Quote"]["05. price"]);

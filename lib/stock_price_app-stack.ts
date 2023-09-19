@@ -8,6 +8,8 @@ import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import * as fs from 'fs';
 import * as path from 'path';
 
+
+
 export class StockPriceAppStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -23,24 +25,25 @@ export class StockPriceAppStack extends cdk.Stack {
   })
     lambdaRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonDynamoDBFullAccess'));
     lambdaRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('SecretsManagerReadWrite'));
+    lambdaRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess'));
 
     // Lambda Functions
 
     const stockPriceFetchLambda = new lambda.Function(this, 'StockPriceFetchLambda', {
       runtime: lambda.Runtime.NODEJS_18_X,
-      code: lambda.Code.fromAsset('../services/'),
+      code: lambda.Code.fromAsset('./services'),
       handler: 'lambda_fetch_function.handler',
       functionName: 'StockPriceFetchLambda',
       role: lambdaRole
     })
 
-    const stockPriceStoreLambda = new lambda.Function(this, 'StockPriceStoreLambda', {
-      runtime: lambda.Runtime.NODEJS_18_X,
-      code: lambda.Code.fromAsset('../services/'),
-      handler: 'lambda_store_function.handler',
-      functionName: 'StockPriceStoreLambda',
-      role: lambdaRole
-    })
+    // const stockPriceStoreLambda = new lambda.Function(this, 'StockPriceStoreLambda', {
+    //   runtime: lambda.Runtime.NODEJS_18_X,
+    //   code: lambda.Code.fromAsset('../services/'),
+    //   handler: 'lambda_store_function.handler',
+    //   functionName: 'StockPriceStoreLambda',
+    //   role: lambdaRole
+    // })
 
     // API Gatway
 
@@ -58,21 +61,30 @@ export class StockPriceAppStack extends cdk.Stack {
     const apiEndpoint = stockApiGateway.url;
 
     // Read index.html and replace the placeholder
-    const indexPath = path.join(__dirname, '../index.html');
+    const indexPath = path.join(__dirname, '../dist/index.html');
     let indexContent = fs.readFileSync(indexPath, 'utf8');
     indexContent = indexContent.replace('{{API_ENDPOINT}}', apiEndpoint);
     fs.writeFileSync(indexPath, indexContent);
 
     // Create an S3 bucket for your site
     const websiteBucket = new s3.Bucket(this, 'WebsiteBucket', {
+      // bucketName: 'brianshand-testbucket-stockpriceapp01',
+      versioned: true,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
       websiteIndexDocument: 'index.html',
       publicReadAccess: true,  
     });
 
     // Deploy your site to the S3 bucket
     new s3deploy.BucketDeployment(this, 'DeployWebsite', {
-      sources: [s3deploy.Source.asset('../index.html')],
+      sources: [s3deploy.Source.asset(path.join(__dirname, '../dist'))],
       destinationBucket: websiteBucket,
+      role: lambdaRole,
+      // distributionOptions: {
+      //   cacheControl: [s3deploy.CacheControl.fromString('max-age=31536000,public')],
+      // },
+      accessControl: s3.BucketAccessControl.PUBLIC_READ
+      
     });
 }
 

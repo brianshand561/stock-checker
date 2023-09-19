@@ -1,8 +1,8 @@
 {
-  "name": "stock price app",
+  "name": "stock_price_app",
   "version": "0.1.0",
   "bin": {
-    "stock price app": "bin/stock price app.js"
+    "stock price app": "bin/stock_price_app.js"
   },
   "scripts": {
     "build": "tsc",
@@ -23,6 +23,7 @@
     "@aws-sdk/client-secrets-manager": "^3.414.0",
     "aws-cdk-lib": "2.95.1",
     "constructs": "^10.0.0",
+    "node-fetch": "^3.3.2",
     "source-map-support": "^0.5.21"
   }
 }

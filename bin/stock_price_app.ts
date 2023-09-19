@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { StockPriceAppStack } from '../lib/stock price app-stack';
+import { StockPriceAppStack } from '../lib/stock_price_app-stack';
 
 const app = new cdk.App();
 new StockPriceAppStack(app, 'StockPriceAppStack', {
