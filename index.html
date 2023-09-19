@@ -3,9 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Stock Checker</title>
+    <style>
+        
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+
+    </style>
 </head>
 <body>
-    
+
+<h1>Stock Checker</h1>
+
+<div>
+    <input type="text" id="tickerInput" placeholder="Enter Stock Ticker Symbol">
+    <button onclick="fetchStockPrice()">Get Price</button>
+</div>
+
+<div id="popup" style="display: none;">
+    Stock Price: <span id="stockPrice"></span>
+</div>
+
+<script>
+    async function fetchStockPrice() {
+    const tickerSymbol = document.getElementById('tickerInput').value;
+
+    // Assuming you have an API Gateway or some backend endpoint to hit.
+    // Your backend should then communicate with AlphaVantage to get the stock price.
+    const response = await fetch(`{{API_ENDPOINT}}?ticker=${tickerSymbol}`);
+    const data = await response.json();
+
+    const rawPrice = parseFloat(data["Global Quote"]["05. price"]);
+    const formattedPrice = `$${rawPrice.toFixed(2)}`; 
+
+    document.getElementById('stockPrice').innerText = formattedPrice;
+    document.getElementById('popup').style.display = 'block'; // Display the popup
+}
+    </script>
+
 </body>
 </html>

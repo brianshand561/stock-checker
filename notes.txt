@@ -1,0 +1,3 @@
+create more restrictive secrets manager policy so it does not accept writes
+dynamodb policy provides full access - perhaps limit to specific table and only the action lambda needs (GetItem, PutItem)
+enable cloudwatch logs for lambda function to see error messages indicating missing permissions

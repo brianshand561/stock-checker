@@ -5,12 +5,7 @@ on:
 
 jobs:
   infra-deployment:
-    runs-on: sdp-so284-cxw-test-91323
-    env:
-      http_proxy: http://evapzen.fpl.com:10262
-      https_proxy: http://evapzen.fpl.com:10262
-      no_proxy: "nexus.nee.com,localhost,127.0.0.1,.neer-bitbucket,169.254.169.254,*.fpl.com,*.nee.com,*.nexteraenergy.com,*.neeaws.local,vault.fpl.com"
-      AWS_ROLE_TO_ASSUME:  ${{ secrets.AWS_ROLE_TO_ASSUME }}
+    runs-on: ubuntu-latest
       
     steps:
       - name: Use Node.js
