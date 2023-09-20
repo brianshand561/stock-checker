@@ -1,10 +1,13 @@
-const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
-const fetcher = require('node-fetch'); // You might need to add 'node-fetch' to your Lambda's dependencies
+console.log("LAMBDA FUCNTION EXECUTED")
 
-exports.handler = async (event) => {
+const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
+const fetcher = require('node-fetch'); 
+
+exports.handler = async (event:any) => {
     // 1. Access the API key from AWS Secrets Manager
     const client = new SecretsManagerClient({ region: "us-east-1" });
     let apiKey;
+    
     
     try {
         const response = await client.send(new GetSecretValueCommand({
@@ -16,6 +19,8 @@ exports.handler = async (event) => {
         console.error('Error retrieving secret:', error);
         throw new Error('Failed to retrieve API key.');
     }
+
+    console.log(apiKey)
     
     // 2. Use the API key to request stock data from `alphavantage.co`
     const ticker = event.queryStringParameters.ticker; // Extracting the ticker from the incoming request

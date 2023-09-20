@@ -13,6 +13,7 @@
         }
 
     </style>
+    <script src="fetchprice.js" defer></script>
 </head>
 <body>
 
@@ -26,23 +27,6 @@
 <div id="popup" style="display: none;">
     Stock Price: <span id="stockPrice"></span>
 </div>
-
-<script>
-    async function fetchStockPrice() {
-    const tickerSymbol = document.getElementById('tickerInput').value;
-
-    // Assuming you have an API Gateway or some backend endpoint to hit.
-    // Your backend should then communicate with AlphaVantage to get the stock price.
-    const response = await fetch(`https://${Token[TOKEN.670]}.execute-api.${Token[AWS.Region.11]}.${Token[AWS.URLSuffix.8]}/${Token[TOKEN.678]}/?ticker=${tickerSymbol}`);
-    const data = await response.json();
-
-    const rawPrice = parseFloat(data["Global Quote"]["05. price"]);
-    const formattedPrice = `$${rawPrice.toFixed(2)}`; 
-
-    document.getElementById('stockPrice').innerText = formattedPrice;
-    document.getElementById('popup').style.display = 'block'; // Display the popup
-}
-    </script>
 
 </body>
 </html>
