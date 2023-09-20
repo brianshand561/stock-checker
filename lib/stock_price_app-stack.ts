@@ -5,6 +5,7 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
+import * as nodejs_lambda from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -26,6 +27,8 @@ export class StockPriceAppStack extends cdk.Stack {
     lambdaRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonDynamoDBFullAccess'));
     lambdaRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('SecretsManagerReadWrite'));
     lambdaRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess'));
+    // lambdaRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AWSLambdaBasicExecutionRole'));
+    
 
   //   const s3DeployRole = new iam.Role(this, 'S3DeployRole', {
   //     assumedBy: new iam.ServicePrincipal('cloudformation.amazonaws.com'),
@@ -91,9 +94,22 @@ export class StockPriceAppStack extends cdk.Stack {
 
     // Lambda Functions
 
+    // const stockPriceFetchLambda = new nodejs_lambda.NodejsFunction(
+    //   this,
+    //   "StockPriceFetchLambda",
+    //   {
+    //     functionName: "StockPriceFetchLambda",
+    //     entry: "./services/lambda_fetch_function.ts",
+    //     handler: "handler",
+    //     role: lambdaRole,
+    //     runtime: lambda.Runtime.NODEJS_16_X,
+        
+    //   }
+    // );
+
     const stockPriceFetchLambda = new lambda.Function(this, 'StockPriceFetchLambda', {
       runtime: lambda.Runtime.NODEJS_18_X,
-      code: lambda.Code.fromAsset('./services'),
+      code: lambda.Code.fromAsset('./build/services/fetch'),
       handler: 'lambda_fetch_function.handler',
       functionName: 'StockPriceFetchLambda',
       role: lambdaRole
@@ -101,11 +117,14 @@ export class StockPriceAppStack extends cdk.Stack {
 
     // const stockPriceStoreLambda = new lambda.Function(this, 'StockPriceStoreLambda', {
     //   runtime: lambda.Runtime.NODEJS_18_X,
-    //   code: lambda.Code.fromAsset('../services/'),
+    //   code: lambda.Code.fromAsset('../build/services/store'),
     //   handler: 'lambda_store_function.handler',
     //   functionName: 'StockPriceStoreLambda',
     //   role: lambdaRole
     // })
+
+
+
 
     // API Gatway
 
@@ -117,6 +136,7 @@ export class StockPriceAppStack extends cdk.Stack {
       defaultCorsPreflightOptions: {
         allowOrigins: apigateway.Cors.ALL_ORIGINS,
         allowMethods: apigateway.Cors.ALL_METHODS,
+        
       },
 
 })
@@ -127,19 +147,19 @@ export class StockPriceAppStack extends cdk.Stack {
     // const apiEndpoint = stockApiGateway.url;
 
     // // Read index.html and replace the placeholder
-    // const indexPath = path.join(__dirname, '../dist/fetchprice.js');
+    // const indexPath = path.join(__dirname, '../src/fetchprice.js');
     // let indexContent = fs.readFileSync(indexPath, 'utf8');
     // indexContent = indexContent.replace('{{API_ENDPOINT}}', apiEndpoint);
     // fs.writeFileSync(indexPath, indexContent);
 
 
-    // const configPath = path.join(__dirname, '../dist/config.json');
+    // const configPath = path.join(__dirname, '../src/config.json');
     // let configContent = fs.readFileSync(configPath, 'utf8');
     // const config = JSON.parse(configContent);
     // config.API_ENDPOINT = apiEndpoint;
     // fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
 
-    
+
 
     // Create an S3 bucket for your site
     const websiteBucket = new s3.Bucket(this, 'WebsiteBucket', {
@@ -155,7 +175,7 @@ export class StockPriceAppStack extends cdk.Stack {
 
     // Deploy your site to the S3 bucket
     new s3deploy.BucketDeployment(this, 'DeployWebsite', {
-      sources: [s3deploy.Source.asset('./dist/')],
+      sources: [s3deploy.Source.asset('./src/')],
       destinationBucket: websiteBucket,
       role: S3DeployRole,
       // distributionOptions: {

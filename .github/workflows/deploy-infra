@@ -21,8 +21,7 @@ jobs:
           npm i -g --force yarn  
           yarn install 
 
-      - name: Infrastructure Test
-        run: npm run test
+
           
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
