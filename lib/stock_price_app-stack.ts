@@ -6,6 +6,7 @@ import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import * as nodejs_lambda from 'aws-cdk-lib/aws-lambda-nodejs';
+import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -29,26 +30,12 @@ export class StockPriceAppStack extends cdk.Stack {
     lambdaRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess'));
     // lambdaRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AWSLambdaBasicExecutionRole'));
     
-
-  //   const s3DeployRole = new iam.Role(this, 'S3DeployRole', {
-  //     assumedBy: new iam.ServicePrincipal('cloudformation.amazonaws.com'),
-  //     description: 'Role for S3 Deployment',
-  //     roleName: 'S3DeployRole'
-  // });
-    
-  //   s3DeployRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess'));
-
     const S3DeployRole = new iam.Role(
       this,
       "S3-Deployment-Lambda-Execution-Role",
       {
         assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
         roleName: 's3-deployment-lambda-execution-role',
-        // permissionsBoundary: iam.ManagedPolicy.fromManagedPolicyArn(
-        //     this,
-        //     "IAMPermissionsBoundary for S3 Bucket Deployment Lambda Execution Role",
-        //     props.appPermissionsBoundary!
-        // ),
         inlinePolicies: {
             CDKPolicyForS3BucketDeployment: new iam.PolicyDocument({
               statements: [
@@ -107,22 +94,6 @@ export class StockPriceAppStack extends cdk.Stack {
       }
     );
 
-    // const stockPriceFetchLambda = new lambda.Function(this, 'StockPriceFetchLambda', {
-    //   runtime: lambda.Runtime.NODEJS_18_X,
-    //   code: lambda.Code.fromAsset('./build/services/fetch'),
-    //   handler: 'lambda_fetch_function.handler',
-    //   functionName: 'StockPriceFetchLambda',
-    //   role: lambdaRole
-    // })
-
-    // const stockPriceStoreLambda = new lambda.Function(this, 'StockPriceStoreLambda', {
-    //   runtime: lambda.Runtime.NODEJS_18_X,
-    //   code: lambda.Code.fromAsset('../build/services/store'),
-    //   handler: 'lambda_store_function.handler',
-    //   functionName: 'StockPriceStoreLambda',
-    //   role: lambdaRole
-    // })
-
     const ibmstockPriceFetchLambda = new nodejs_lambda.NodejsFunction(
       this,
       "IBMStockPriceFetchLambda",
@@ -135,9 +106,6 @@ export class StockPriceAppStack extends cdk.Stack {
         
       }
     );
-
-
-
 
     // API Gatway
 
@@ -159,24 +127,7 @@ export class StockPriceAppStack extends cdk.Stack {
     const IBMstockprice = stockApiGateway.root.addResource('ibm');
     IBMstockprice.addMethod('GET', new apigateway.LambdaIntegration(ibmstockPriceFetchLambda));
 
-    
-//     const IBMstockApiGateway = new apigateway.LambdaRestApi(this, 'IBMStockApiGateway', {
-//       handler: ibmstockPriceFetchLambda,
-//       proxy: false,
-//       restApiName: 'IBMStockApiGateway',
-//       deploy: true,
-//       defaultCorsPreflightOptions: {
-//         allowOrigins: apigateway.Cors.ALL_ORIGINS,
-//         allowMethods: apigateway.Cors.ALL_METHODS,
-        
-//       },
 
-// })
-    
-    
-//     const IBMstockprice = IBMstockApiGateway.root.addResource('ibm');
-//     IBMstockprice.addMethod('GET', new apigateway.LambdaIntegration(ibmstockPriceFetchLambda));
-    
 
     // Fetch the API Gateway endpoint
     // const apiEndpoint = stockApiGateway.url;
@@ -219,7 +170,21 @@ export class StockPriceAppStack extends cdk.Stack {
       // accessControl: s3.BucketAccessControl.PUBLIC_READ
       
     });
+
+    // Create DynamoDB table
+    const stockTable = new dynamodb.Table(this, 'StockTable', {
+      tableName: 'StockTable',
+      partitionKey: { name: 'ticker', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'timestamp', type: dynamodb.AttributeType.STRING },
+      removalPolicy: cdk.RemovalPolicy.DESTROY,  // Useful for dev/test environments; remove for production
+    });
+
+    stockTable.grantWriteData(stockPriceFetchLambda);
+
+
 }
+
+
 
 }
 

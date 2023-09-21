@@ -1,3 +1,5 @@
 create more restrictive secrets manager policy so it does not accept writes
 dynamodb policy provides full access - perhaps limit to specific table and only the action lambda needs (GetItem, PutItem)
 enable cloudwatch logs for lambda function to see error messages indicating missing permissions
+revisit making apigateway endpoint dynamically added (currently hardcoded) to javascript functions so cdk deploy only occurs once, if starting over. 
+had to manually enable cloudwatch logs for lambda. verify later if still the charset
