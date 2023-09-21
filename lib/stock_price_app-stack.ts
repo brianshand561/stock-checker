@@ -144,6 +144,14 @@ export class StockPriceAppStack extends cdk.Stack {
     dynamofetcher.addMethod('GET', new apigateway.LambdaIntegration(dynamoFetchLambda));
 
 
+    // Dynamically add apiEndpoint to js function
+    const apiEndpoint = stockApiGateway.url;
+
+    const config = {
+      API_ENDPOINT: apiEndpoint
+    };
+    
+    fs.writeFileSync('./src/config.json', JSON.stringify(config));
 
     // Fetch the API Gateway endpoint
     // const apiEndpoint = stockApiGateway.url;
@@ -197,6 +205,11 @@ export class StockPriceAppStack extends cdk.Stack {
 
     stockTable.grantWriteData(stockPriceFetchLambda);
 
+    new cdk.CfnOutput(this, 'ApiGatewayUrl', {
+      value: stockApiGateway.url,
+      description: 'The URL of the API Gateway',
+      exportName: 'ApiGatewayUrl',
+    });
 
 }
 

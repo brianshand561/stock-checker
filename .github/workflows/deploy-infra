@@ -6,6 +6,8 @@ on:
 jobs:
   infra-deployment:
     runs-on: ubuntu-latest
+    env:
+      AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
       
     steps:
       - name: Use Node.js
@@ -21,12 +23,9 @@ jobs:
           npm i -g --force yarn  
           yarn install 
 
-
-          
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          
           role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 2400
           aws-region: "us-east-1"
@@ -37,9 +36,12 @@ jobs:
           npm install -g aws-cdk@2.64.0
           cdk deploy --all --require-approval=never --outputs-file ./distributionLink.json
 
-      - name: Summary Report
+      - name: Extract API Gateway URL and Write to config.json
         run: |
-          CFDistributionId=$(jq -r '.["so284-cxw-test-91323-Test app"].CFDistributionId' < distributionLink.json)
-          echo $CFDistributionId
-          LINE1="## :rocket: CloudFront URL: [${CFDistributionId}](https://${CFDistributionId}) :rocket:"
-          echo $LINE1 >> $GITHUB_STEP_SUMMARY
+          API_URL=$(jq -r '.["StockPriceAppStack.ApiGatewayUrl"]' distributionLink.json)
+          echo "{\"API_ENDPOINT\": \"$API_URL\"}" > config.json
+
+      # Optional: Push config.json to S3
+      - name: Upload config.json to S3
+        run: |
+          aws s3 cp config.json s3://your-s3-bucket-name/path/to/folder/
