@@ -5,15 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock Checker</title>
     <style>
-        
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
             text-align: center;
         }
-
     </style>
     <script src="fetchprice.js" defer></script>
+    <script src="fetchIBM.js" defer></script> <!-- Include the new JS file -->
 </head>
 <body>
 
@@ -22,6 +21,7 @@
 <div>
     <input type="text" id="tickerInput" placeholder="Enter Stock Ticker Symbol">
     <button onclick="fetchStockPrice()">Get Price</button>
+    <button onclick="fetchIBMPrice()">Get IBM Price</button> <!-- New button -->
 </div>
 
 <div id="popup" style="display: none;">

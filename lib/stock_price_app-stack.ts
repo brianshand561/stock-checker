@@ -94,26 +94,26 @@ export class StockPriceAppStack extends cdk.Stack {
 
     // Lambda Functions
 
-    // const stockPriceFetchLambda = new nodejs_lambda.NodejsFunction(
-    //   this,
-    //   "StockPriceFetchLambda",
-    //   {
-    //     functionName: "StockPriceFetchLambda",
-    //     entry: "./services/lambda_fetch_function.ts",
-    //     handler: "handler",
-    //     role: lambdaRole,
-    //     runtime: lambda.Runtime.NODEJS_16_X,
+    const stockPriceFetchLambda = new nodejs_lambda.NodejsFunction(
+      this,
+      "StockPriceFetchLambda",
+      {
+        functionName: "StockPriceFetchLambda",
+        entry: "./build/services/fetch/lambda_fetch_function.js",
+        handler: "handler",
+        role: lambdaRole,
+        runtime: lambda.Runtime.NODEJS_16_X,
         
-    //   }
-    // );
+      }
+    );
 
-    const stockPriceFetchLambda = new lambda.Function(this, 'StockPriceFetchLambda', {
-      runtime: lambda.Runtime.NODEJS_18_X,
-      code: lambda.Code.fromAsset('./build/services/fetch'),
-      handler: 'lambda_fetch_function.handler',
-      functionName: 'StockPriceFetchLambda',
-      role: lambdaRole
-    })
+    // const stockPriceFetchLambda = new lambda.Function(this, 'StockPriceFetchLambda', {
+    //   runtime: lambda.Runtime.NODEJS_18_X,
+    //   code: lambda.Code.fromAsset('./build/services/fetch'),
+    //   handler: 'lambda_fetch_function.handler',
+    //   functionName: 'StockPriceFetchLambda',
+    //   role: lambdaRole
+    // })
 
     // const stockPriceStoreLambda = new lambda.Function(this, 'StockPriceStoreLambda', {
     //   runtime: lambda.Runtime.NODEJS_18_X,
@@ -122,6 +122,19 @@ export class StockPriceAppStack extends cdk.Stack {
     //   functionName: 'StockPriceStoreLambda',
     //   role: lambdaRole
     // })
+
+    const ibmstockPriceFetchLambda = new nodejs_lambda.NodejsFunction(
+      this,
+      "IBMStockPriceFetchLambda",
+      {
+        functionName: "IBMStockPriceFetchLambda",
+        entry: "./build/services/IBM/ibm_lambda_fetch_function.js",
+        handler: "handler",
+        role: lambdaRole,
+        runtime: lambda.Runtime.NODEJS_16_X,
+        
+      }
+    );
 
 
 
@@ -142,6 +155,28 @@ export class StockPriceAppStack extends cdk.Stack {
 })
     const stockprice = stockApiGateway.root.addResource('stockprice');
     stockprice.addMethod('GET', new apigateway.LambdaIntegration(stockPriceFetchLambda));
+
+    const IBMstockprice = stockApiGateway.root.addResource('ibm');
+    IBMstockprice.addMethod('GET', new apigateway.LambdaIntegration(ibmstockPriceFetchLambda));
+
+    
+//     const IBMstockApiGateway = new apigateway.LambdaRestApi(this, 'IBMStockApiGateway', {
+//       handler: ibmstockPriceFetchLambda,
+//       proxy: false,
+//       restApiName: 'IBMStockApiGateway',
+//       deploy: true,
+//       defaultCorsPreflightOptions: {
+//         allowOrigins: apigateway.Cors.ALL_ORIGINS,
+//         allowMethods: apigateway.Cors.ALL_METHODS,
+        
+//       },
+
+// })
+    
+    
+//     const IBMstockprice = IBMstockApiGateway.root.addResource('ibm');
+//     IBMstockprice.addMethod('GET', new apigateway.LambdaIntegration(ibmstockPriceFetchLambda));
+    
 
     // Fetch the API Gateway endpoint
     // const apiEndpoint = stockApiGateway.url;
