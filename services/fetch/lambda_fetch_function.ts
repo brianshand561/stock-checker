@@ -64,6 +64,7 @@ exports.handler = async (event:any) => {
             timestamp: new Date().toISOString()
         }
     }).promise();
+    
 
     return {
         statusCode: 200,

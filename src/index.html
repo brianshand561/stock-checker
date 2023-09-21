@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,10 +11,28 @@
             padding: 20px;
             text-align: center;
         }
+
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin: 20px auto;
+        }
+
+        table th, table td {
+            border: 1px solid black;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+        }
+
     </style>
     <script src="fetchprice.js" defer></script>
     <script src="fetchIBM.js" defer></script> <!-- Include the new JS file -->
 </head>
+
 <body>
 
 <h1>Stock Checker</h1>
@@ -28,5 +47,21 @@
     Stock Price: <span id="stockPrice"></span>
 </div>
 
+<!-- Table for displaying the DynamoDB contents -->
+<h2>Stock Price History</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Ticker</th>
+            <th>Price</th>
+            <th>Timestamp</th>
+        </tr>
+    </thead>
+    <tbody id="stockHistory">
+        <!-- This will be populated with the data from DynamoDB -->
+    </tbody>
+</table>
+
 </body>
+
 </html>

@@ -107,6 +107,19 @@ export class StockPriceAppStack extends cdk.Stack {
       }
     );
 
+    const dynamoFetchLambda = new nodejs_lambda.NodejsFunction(
+      this,
+      "dynamoFetchLambda",
+      {
+        functionName: "dynamoFetchLambda",
+        entry: "./build/services/dynamofetch/lambda_dynamofetch_function.js",
+        handler: "handler",
+        role: lambdaRole,
+        runtime: lambda.Runtime.NODEJS_16_X,
+        
+      }
+    );
+
     // API Gatway
 
     const stockApiGateway = new apigateway.LambdaRestApi(this, 'StockApiGateway', {
@@ -126,6 +139,9 @@ export class StockPriceAppStack extends cdk.Stack {
 
     const IBMstockprice = stockApiGateway.root.addResource('ibm');
     IBMstockprice.addMethod('GET', new apigateway.LambdaIntegration(ibmstockPriceFetchLambda));
+
+    const dynamofetcher = stockApiGateway.root.addResource('dynamofetcher');
+    dynamofetcher.addMethod('GET', new apigateway.LambdaIntegration(dynamoFetchLambda));
 
 
 
