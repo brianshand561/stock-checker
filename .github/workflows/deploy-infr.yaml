@@ -32,6 +32,7 @@ jobs:
           role-duration-seconds: 2400
           aws-region: "us-east-1"
           role-skip-session-tagging: true
+          role-external-id: "099644482610"
 
       - name: CDK Deploy
         run: |
