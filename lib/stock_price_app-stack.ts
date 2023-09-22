@@ -211,6 +211,12 @@ export class StockPriceAppStack extends cdk.Stack {
       exportName: 'ApiGatewayUrl',
     });
 
+    new cdk.CfnOutput(this, 'WebsiteBucketName', {
+      value: websiteBucket.bucketName,
+      description: 'The name of the bucket',
+      exportName: 'WebsiteBucketName',
+    });
+
 }
 
 
