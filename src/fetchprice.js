@@ -31,7 +31,7 @@ async function fetchStockPrice() {
 function populateStockHistory() {
    
     // Call your Lambda function that reads the DynamoDB
-    fetch('${apiEndpoint}dynamofetcher')
+    fetch(`${apiEndpoint}dynamofetcher`)
         .then(response => response.json())
         .then(data => {
             const tableBody = document.getElementById('stockHistory');
@@ -52,5 +52,5 @@ function populateStockHistory() {
         });
 }
 
-console.log('Stockprice URL:', stockpriceURL);
-console.log('Dynamofetcher URL:', dynamofetcherURL);
+// console.log('Stockprice URL:', stockpriceURL);
+// console.log('Dynamofetcher URL:', dynamofetcherURL);
